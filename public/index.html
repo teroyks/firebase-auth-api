@@ -42,7 +42,7 @@
       // fetch timestamp from API
       // authenticate API request with JWT auth token
       const fetchFromApi = userIdToken => {
-        return fetch('http://localhost:5000/api', {
+        return fetch('/api', {
           headers: {
             Authorization: `Bearer ${userIdToken}`,
           },
