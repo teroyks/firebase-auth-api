@@ -32,8 +32,7 @@ const authenticate = (
     !req.headers.authorization ||
     !req.headers.authorization.startsWith(`Bearer `)
   ) {
-    console.log(`User not authenticated`)
-    denyAccess(res)
+    next(`User not authenticated`)
     return
   }
 
@@ -48,9 +47,7 @@ const authenticate = (
       next()
     })
     .catch(() => {
-      console.log(`Got invalid token`)
-      denyAccess(res)
-      return
+      next(`Got invalid token`)
     })
 }
 
@@ -61,17 +58,33 @@ const authorize = (
   res: express.Response,
   next: express.NextFunction
 ) => {
-  if (!req.user || !req.user.email.endsWith(allowedDomain)) {
-    console.log(`Unauthorized user email`)
-    denyAccess(res)
+  if (!allowedDomain) {
+    // no domain restriction set
+    next()
+  } else if (!req.user || !req.user.email) {
+    next(`Missing user email`)
+  } else if (!req.user.email.endsWith(allowedDomain)) {
+    next(`Unauthorized user email '${req.user.email}'`)
   } else {
-    console.log(`User ok`)
+    // user authorized
     next()
   }
 }
 
+// handle authentication and authorization errors
+const rejectOnAuthError = (
+  err: express.ErrorRequestHandler,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  console.log(err)
+  denyAccess(res)
+}
+
 app.use(authenticate)
 app.use(authorize)
+app.use(rejectOnAuthError)
 
 app.get(`/api`, (req: express.Request, res: express.Response) => {
   res.send(`${Date.now()}`)
