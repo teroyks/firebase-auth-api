@@ -8,26 +8,59 @@
   <body>
     <main>
       <h1>Firebase Test App</h1>
-      <div id="firebaseui-auth-container"></div>
+      <div id="login-container"></div>
+      <div id="api-content">Fetching…</div>
     </main>
     <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-auth.js"></script>
     <script src="firebase.js"></script>
 
     <script type="text/javascript">
-      const content = document.getElementById('firebaseui-auth-container')
+      const content = document.getElementById('login-container')
+      const apiContent = document.getElementById('api-content')
+
+      // update page content based on login status
       firebase.auth().onAuthStateChanged(user => {
         if (user) {
-          console.log('logged in', user)
-          content.innerHTML = `<p>Successfully logged in as ${
-            user.displayName
-          }</p>
+          content.innerHTML = `<p>Logged in as ${user.displayName}</p>
           <p><button onClick="firebase.auth().signOut();">Logout</button></p>`
-          user.getIdToken().then(token => console.log(`uid token: ${token}`))
+          user
+            .getIdToken()
+            .then(token => {
+              console.log(`uid token: ${token}`)
+              return fetchFromApi(token)
+            })
+            .then(content => {
+              apiContent.innerHTML = content
+            })
         } else {
           content.innerHTML = '<a href="login.html">Login</a>'
+          apiContent.innerText = ''
         }
       })
+
+      // fetch timestamp from API
+      // authenticate API request with JWT auth token
+      const fetchFromApi = userIdToken => {
+        return fetch('http://localhost:5000/api', {
+          headers: {
+            Authorization: `Bearer ${userIdToken}`,
+          },
+        })
+          .then(response => {
+            if (response.ok) {
+              return response.text()
+            }
+            throw new Error(
+              `API response not ok, status: ${response.status} ${
+                response.statusText
+              }`
+            )
+          })
+          .catch(err => {
+            return `error`
+          })
+      }
     </script>
   </body>
 </html>
