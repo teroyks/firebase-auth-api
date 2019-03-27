@@ -32,6 +32,7 @@ const authenticate = (
     !req.headers.authorization ||
     !req.headers.authorization.startsWith(`Bearer `)
   ) {
+    console.log(`User not authenticated`)
     denyAccess(res)
     return
   }
