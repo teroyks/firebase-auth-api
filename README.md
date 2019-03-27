@@ -7,11 +7,13 @@ This is a very simple API authentication example, using the following stack:
   - functions written in Typescript
   - Express.js is used to handle the API calls
 - FirebaseUI for handling the login UI
-- Log in with a Google account.
+- Firebase authentication, log in with a Google account.
 
 There are only two web pages in the example – a login page and a page that checks the login status and either links to the login page or displays the user name and fetches current timestamp from the API using the logged-in users credentials to authenticate with the API.
 
 The API has only one endpoint that validates the caller's authentication credentials (and optionally restricts users to one domain), and returns the current timestamp.
+
+The API is stateless, ie. the ID token must be sent with every request.
 
 ## Installation
 
@@ -92,3 +94,9 @@ Package the application and deploy to Firebase:
 ```shell
 npm run deploy
 ```
+
+## References
+
+- Firebase example on [authenticated JSON API](https://github.com/firebase/functions-samples/tree/master/authenticated-json-api)
+- [FirebaseUI for Web](https://github.com/firebase/FirebaseUI-Web)
+- FirebaseUI [demo video](https://www.youtube.com/watch?v=hb85pYZSJaI) on Firecasts
