@@ -22,3 +22,7 @@ npm install --save-dev @types/express
 - create a hosting rewrite
 - initialize an express.js app in index
 - add hosting to `npm run serve`
+
+Firebase settings for frontend
+
+- copy the Firebase config from console and paste into `public/firebase.js`
