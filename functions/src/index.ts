@@ -3,6 +3,9 @@ import * as admin from 'firebase-admin'
 
 import express from 'express'
 
+// If you want to restrict users to email with specific domain, e.g. '@gmail.com'
+const allowedDomain = ``
+
 admin.initializeApp()
 const app = express()
 
@@ -50,7 +53,24 @@ const authenticate = (
     })
 }
 
+// Extremely simple authorization: only accept users with email address ending in 'allowedDomain'.
+// If any email is ok, you don't need this.
+const authorize = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  if (!req.user || !req.user.email.endsWith(allowedDomain)) {
+    console.log(`Unauthorized user email`)
+    denyAccess(res)
+  } else {
+    console.log(`User ok`)
+    next()
+  }
+}
+
 app.use(authenticate)
+app.use(authorize)
 
 app.get(`/api`, (req: express.Request, res: express.Response) => {
   res.send(`${Date.now()}`)
